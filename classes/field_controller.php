@@ -1,0 +1,176 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Field controller for customfield_multiselect.
+ *
+ * Manages the admin-side configuration of a multiselect custom field:
+ * the list of available options, optional default selections, and display size.
+ *
+ * Options are stored as a JSON-encoded object in mdl_customfield_field.configdata:
+ *   {"options":"SE 49\nSE 50\nSE 51","defaultvalue":"","displaysize":"5"}
+ *
+ * Options are stored one per line in the textarea. Empty lines are ignored.
+ *
+ * @package   customfield_multiselect
+ * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace customfield_multiselect;
+
+/**
+ * Field controller class for the multiselect custom field type.
+ */
+class field_controller extends \core_customfield\field_controller {
+
+    /**
+     * Plugin type identifier. Must match the directory name under customfield/field/.
+     */
+    const TYPE = 'multiselect';
+
+    /**
+     * Add field-type-specific settings to the field configuration form.
+     *
+     * Called when an admin creates or edits a custom field of this type.
+     * Adds three elements:
+     *  - options:      textarea, one option per line
+     *  - defaultvalue: text, comma-separated defaults (must match option values exactly)
+     *  - displaysize:  integer, number of rows visible in the select element
+     *
+     * @param \MoodleQuickForm $mform The field configuration form.
+     */
+    public function config_form_definition(\MoodleQuickForm $mform): void {
+        $mform->addElement(
+            'header',
+            'header_multiselect_settings',
+            get_string('specificsettings', 'customfield_multiselect')
+        );
+        $mform->setExpanded('header_multiselect_settings', true);
+
+        // Options textarea: one option value per line.
+        $mform->addElement(
+            'textarea',
+            'configdata[options]',
+            get_string('options', 'customfield_multiselect'),
+            ['rows' => 10, 'cols' => 40]
+        );
+        $mform->setType('configdata[options]', PARAM_TEXT);
+        $mform->addHelpButton('configdata[options]', 'options', 'customfield_multiselect');
+
+        // Default value: comma-separated option values, e.g. "SE 49,SE 51".
+        $mform->addElement(
+            'text',
+            'configdata[defaultvalue]',
+            get_string('defaultvalue', 'customfield_multiselect'),
+            ['size' => 60]
+        );
+        $mform->setType('configdata[defaultvalue]', PARAM_TEXT);
+        $mform->addHelpButton('configdata[defaultvalue]', 'defaultvalue', 'customfield_multiselect');
+
+        // Display size: number of visible rows in the HTML select element.
+        $mform->addElement(
+            'text',
+            'configdata[displaysize]',
+            get_string('displaysize', 'customfield_multiselect'),
+            ['size' => 4]
+        );
+        $mform->setType('configdata[displaysize]', PARAM_INT);
+        $mform->setDefault('configdata[displaysize]', 5);
+        $mform->addHelpButton('configdata[displaysize]', 'displaysize', 'customfield_multiselect');
+    }
+
+    /**
+     * Validate the field configuration form data.
+     *
+     * Enforces:
+     * - options is not empty
+     * - displaysize is a positive integer
+     * - each defaultvalue token (if any) is present in the options list
+     *
+     * @param  array $data  Submitted form data.
+     * @param  array $files Submitted files (unused).
+     * @return array        Associative array of element name => error string.
+     */
+    public function config_form_validation(array $data, array $files = []): array {
+        $errors = [];
+
+        // Options must not be empty.
+        $raw = trim($data['configdata']['options'] ?? '');
+        if ($raw === '') {
+            $errors['configdata[options]'] = get_string('erroroptionsrequired', 'customfield_multiselect');
+            return $errors;
+        }
+
+        // Build the canonical options list for default-value validation.
+        $options = $this->parse_options($raw);
+
+        // Displaysize must be a positive integer.
+        $displaysize = (int)($data['configdata']['displaysize'] ?? 0);
+        if ($displaysize < 1) {
+            $errors['configdata[displaysize]'] = get_string('errordisplaysize', 'customfield_multiselect');
+        }
+
+        // Each token in defaultvalue must exist in the options list.
+        $defaultraw = trim($data['configdata']['defaultvalue'] ?? '');
+        if ($defaultraw !== '') {
+            $defaults = array_map('trim', explode(',', $defaultraw));
+            foreach ($defaults as $token) {
+                if ($token !== '' && !in_array($token, $options, true)) {
+                    $errors['configdata[defaultvalue]'] = get_string(
+                        'errordefaultnotanoption',
+                        'customfield_multiselect',
+                        s($token)
+                    );
+                    break;
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Return the parsed options list from configdata.
+     *
+     * Splits the stored options string on newlines, trims whitespace,
+     * and removes blank lines. Used by both this class and data_controller.
+     *
+     * @return string[] Ordered array of option text values.
+     */
+    public function get_options(): array {
+        $raw = $this->get_configdata_property('options') ?? '';
+        return $this->parse_options($raw);
+    }
+
+    /**
+     * Parse a raw newline-delimited options string into a clean array.
+     *
+     * @param  string   $raw Raw textarea content.
+     * @return string[]      Trimmed, non-empty option values.
+     */
+    private function parse_options(string $raw): array {
+        $lines = explode("\n", str_replace("\r\n", "\n", $raw));
+        $options = [];
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if ($trimmed !== '') {
+                $options[] = $trimmed;
+            }
+        }
+        return $options;
+    }
+}

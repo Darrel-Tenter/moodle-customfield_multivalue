@@ -19,12 +19,11 @@
  *
  * STORAGE CONTRACT:
  *   Selected values are stored as a comma-separated string of option text values
- *   in mdl_customfield_data.value - e.g., 'SE 49,SE 51'.
+ *   in mdl_customfield_data.value — e.g., 'SE 49,SE 51'.
  *   - No spaces around commas.
  *   - Each token matches an option value exactly (trimmed).
  *   - Empty selection is stored as '' (empty string), never NULL.
  *   - intvalue is set to 0 (not used for this type).
- *   - Enables: FIND_IN_SET('SE 49', cf.value) > 0
  *
  * @package   customfield_multiselect
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
@@ -33,25 +32,30 @@
 
 namespace customfield_multiselect;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Data controller class for the multiselect custom field type.
  */
 class data_controller extends \core_customfield\data_controller {
 
     /**
-     * Return the database column used to store this field's data.
-     * Using 'value' (TEXT, unlimited) not 'charvalue' (255 chars).
+     * Return the name of the database column used to store this field's data.
      *
-     * @return string
+     * We use 'value' (TEXT, unlimited length) rather than 'charvalue' (255 chars).
+     *
+     * @return string The column name in mdl_customfield_data.
      */
     public function datafield(): string {
         return 'value';
     }
 
     /**
-     * Add the multiselect autocomplete element to the instance edit form.
+     * Add the multiselect element to the instance edit form (e.g., course settings).
      *
-     * @param \MoodleQuickForm $mform
+     * Uses Moodle's autocomplete form element with multiple selection enabled.
+     *
+     * @param \MoodleQuickForm $mform The instance edit form.
      */
     public function instance_form_definition(\MoodleQuickForm $mform): void {
         $elementname = $this->get_form_element_name();
@@ -63,7 +67,13 @@ class data_controller extends \core_customfield\data_controller {
             'size'     => max(2, min($displaysize, 20)),
         ];
 
-        $mform->addElement('autocomplete', $elementname, $this->get_field()->get('name'), $options, $attrs);
+        $mform->addElement(
+            'autocomplete',
+            $elementname,
+            $this->get_field()->get('name'),
+            $options,
+            $attrs
+        );
         $mform->setType($elementname, PARAM_TEXT);
 
         if ($this->get_field()->get_configdata_property('required') == 1) {
@@ -72,33 +82,59 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Prepare stored value for display in the instance edit form.
+     * Called from instance edit form definition_after_data().
      *
-     * Sets $instance->elementname as an array so that $form->set_data($instance)
-     * correctly pre-selects options in the autocomplete element.
-     * This is the correct pattern for Moodle autocomplete pre-population.
+     * Converts the stored comma-separated string back into an array so that
+     * MoodleQuickForm can pre-select the correct options.
      *
-     * @param \stdClass $instance Record being edited (e.g., course object).
+     * @param \MoodleQuickForm $mform The instance edit form.
+     */
+    public function instance_form_definition_after_data(\MoodleQuickForm $mform): void {
+        $elementname = $this->get_form_element_name();
+
+        if (!$mform->elementExists($elementname)) {
+            return;
+        }
+
+        $stored = $this->get_stored_value();
+
+        if ($stored !== '') {
+            $selected = array_map('trim', explode(',', $stored));
+            $mform->getElement($elementname)->setSelected($selected);
+        } else {
+            $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
+            if ($defaultraw !== '') {
+                $defaults = array_map('trim', explode(',', $defaultraw));
+                $mform->getElement($elementname)->setSelected($defaults);
+            }
+        }
+    }
+
+    /**
+     * Prepare custom field data for set_data() before the form is displayed.
+     *
+     * @param \stdClass $instance The record being edited (e.g., a course object).
      */
     public function instance_form_before_set_data(\stdClass $instance): void {
         $elementname = $this->get_form_element_name();
         $stored      = $this->get_stored_value();
 
         if ($stored !== '') {
-            $instance->$elementname = $this->string_to_array($stored);
+            $instance->$elementname = array_map('trim', explode(',', $stored));
         } else {
             $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
-            $instance->$elementname = $defaultraw !== '' ? $this->string_to_array($defaultraw) : [];
+            if ($defaultraw !== '') {
+                $instance->$elementname = array_map('trim', explode(',', $defaultraw));
+            } else {
+                $instance->$elementname = [];
+            }
         }
     }
 
     /**
-     * Save custom field data from the submitted instance edit form.
+     * Save custom field data from the submitted form.
      *
-     * Autocomplete with multiple=true submits as an array via $form->get_data().
-     * Joins to comma-separated string and saves to value column.
-     *
-     * @param \stdClass $datanew Submitted form data.
+     * @param \stdClass $datanew The submitted form data object.
      */
     public function instance_form_save(\stdClass $datanew): void {
         $elementname = $this->get_form_element_name();
@@ -110,13 +146,11 @@ class data_controller extends \core_customfield\data_controller {
         $submitted = $datanew->$elementname;
 
         if (is_array($submitted)) {
-            $tokens = array_values(array_filter(
-                array_map('trim', $submitted),
-                static function(string $v): bool {
-                    return $v !== '';
-                }
-            ));
-            $value = implode(',', $tokens);
+            $tokens = array_map('trim', $submitted);
+            $tokens = array_filter($tokens, static function($t) {
+                return $t !== '';
+            });
+            $value = implode(',', array_values($tokens));
         } else {
             $value = trim((string)$submitted);
         }
@@ -127,29 +161,34 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Returns selected values in human-readable format for display.
-     * Returns array of selected option text values, or null if empty.
+     * Returns the value in a human-readable format for display.
      *
-     * @return string[]|null
+     * @return array|null Array of selected values, or null if empty.
      */
     public function export_value() {
         $stored = $this->get_stored_value();
+
         if ($stored === '') {
             return null;
         }
-        $values = $this->string_to_array($stored);
-        return empty($values) ? null : $values;
+
+        $values = array_map('trim', explode(',', $stored));
+        $values = array_filter($values, static function($v) {
+            return $v !== '';
+        });
+
+        return empty($values) ? null : array_values($values);
     }
 
     /**
-     * Check whether the value is considered empty.
+     * Check whether the stored value is considered empty.
      *
-     * @param  mixed $value
-     * @return bool
+     * @param  mixed $value The value to check.
+     * @return bool         True if the value represents no selection.
      */
     public function is_empty($value): bool {
         if (is_array($value)) {
-            $filtered = array_filter($value, static function($v): bool {
+            $filtered = array_filter($value, static function($v) {
                 return trim((string)$v) !== '';
             });
             return empty($filtered);
@@ -158,40 +197,25 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Return the raw stored string value from the database.
-     * Always returns a string; empty string when no data record exists.
+     * Return the stored comma-separated value, or empty string if no record exists.
      *
-     * @return string
+     * Named distinctly from get_value() to avoid conflicting with the parent's
+     * mixed return type declaration in Moodle 5.x.
+     *
+     * @return string The stored value, or empty string.
      */
     private function get_stored_value(): string {
         if (!$this->get('id')) {
-            return '';
+            $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
+            return $defaultraw;
         }
-        $raw = $this->get($this->datafield());
-        return $raw !== null ? (string)$raw : '';
+        return (string)$this->get($this->datafield());
     }
 
     /**
-     * Parse a comma-separated string into a clean array of trimmed, non-empty values.
+     * Build the key => label options array for the MoodleQuickForm autocomplete element.
      *
-     * @param  string   $csv Comma-separated values, e.g. 'SE 49,SE 51'
-     * @return string[]      Ordered array of option text values.
-     */
-    private function string_to_array(string $csv): array {
-        return array_values(array_filter(
-            array_map('trim', explode(',', $csv)),
-            static function(string $v): bool {
-                return $v !== '';
-            }
-        ));
-    }
-
-    /**
-     * Build key => label options array for the autocomplete form element.
-     * Key and label are both the option text value (e.g., 'SE 49').
-     * This means FIND_IN_SET() works directly on the stored string.
-     *
-     * @return array<string, string>
+     * @return array<string,string> ['SE 49' => 'SE 49', 'SE 50' => 'SE 50', ...]
      */
     private function get_options_for_form(): array {
         /** @var field_controller $fc */

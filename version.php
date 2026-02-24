@@ -17,10 +17,6 @@
 /**
  * Version information for customfield_multiselect.
  *
- * Adds a multi-select custom field type to Moodle's customfield API.
- * Selected values are stored as a comma-separated string of option text values
- * in mdl_customfield_data.value. Compatible with FIND_IN_SET queries.
- *
  * @package   customfield_multiselect
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'customfield_multiselect';
-$plugin->version   = 2026021900;
+$plugin->version   = 2026022301;
 $plugin->requires  = 2024042200; // Moodle 5.0 minimum.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.0';
+$plugin->release   = '1.0.1';

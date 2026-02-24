@@ -17,14 +17,6 @@
 /**
  * Field controller for customfield_multiselect.
  *
- * Manages the admin-side configuration of a multiselect custom field:
- * the list of available options, optional default selections, and display size.
- *
- * Options are stored as a JSON-encoded object in mdl_customfield_field.configdata:
- *   {"options":"SE 49\nSE 50\nSE 51","defaultvalue":"","displaysize":"5"}
- *
- * Options are stored one per line in the textarea. Empty lines are ignored.
- *
  * @package   customfield_multiselect
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,24 +24,18 @@
 
 namespace customfield_multiselect;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Field controller class for the multiselect custom field type.
  */
 class field_controller extends \core_customfield\field_controller {
 
-    /**
-     * Plugin type identifier. Must match the directory name under customfield/field/.
-     */
+    /** @var string Plugin type identifier. Must match the directory name under customfield/field/. */
     const TYPE = 'multiselect';
 
     /**
      * Add field-type-specific settings to the field configuration form.
-     *
-     * Called when an admin creates or edits a custom field of this type.
-     * Adds three elements:
-     *  - options:      textarea, one option per line
-     *  - defaultvalue: text, comma-separated defaults (must match option values exactly)
-     *  - displaysize:  integer, number of rows visible in the select element
      *
      * @param \MoodleQuickForm $mform The field configuration form.
      */
@@ -61,7 +47,6 @@ class field_controller extends \core_customfield\field_controller {
         );
         $mform->setExpanded('header_multiselect_settings', true);
 
-        // Options textarea: one option value per line.
         $mform->addElement(
             'textarea',
             'configdata[options]',
@@ -71,7 +56,6 @@ class field_controller extends \core_customfield\field_controller {
         $mform->setType('configdata[options]', PARAM_TEXT);
         $mform->addHelpButton('configdata[options]', 'options', 'customfield_multiselect');
 
-        // Default value: comma-separated option values, e.g. "SE 49,SE 51".
         $mform->addElement(
             'text',
             'configdata[defaultvalue]',
@@ -81,7 +65,6 @@ class field_controller extends \core_customfield\field_controller {
         $mform->setType('configdata[defaultvalue]', PARAM_TEXT);
         $mform->addHelpButton('configdata[defaultvalue]', 'defaultvalue', 'customfield_multiselect');
 
-        // Display size: number of visible rows in the HTML select element.
         $mform->addElement(
             'text',
             'configdata[displaysize]',
@@ -96,11 +79,6 @@ class field_controller extends \core_customfield\field_controller {
     /**
      * Validate the field configuration form data.
      *
-     * Enforces:
-     * - options is not empty
-     * - displaysize is a positive integer
-     * - each defaultvalue token (if any) is present in the options list
-     *
      * @param  array $data  Submitted form data.
      * @param  array $files Submitted files (unused).
      * @return array        Associative array of element name => error string.
@@ -108,23 +86,19 @@ class field_controller extends \core_customfield\field_controller {
     public function config_form_validation(array $data, array $files = []): array {
         $errors = [];
 
-        // Options must not be empty.
         $raw = trim($data['configdata']['options'] ?? '');
         if ($raw === '') {
             $errors['configdata[options]'] = get_string('erroroptionsrequired', 'customfield_multiselect');
             return $errors;
         }
 
-        // Build the canonical options list for default-value validation.
         $options = $this->parse_options($raw);
 
-        // Displaysize must be a positive integer.
         $displaysize = (int)($data['configdata']['displaysize'] ?? 0);
         if ($displaysize < 1) {
             $errors['configdata[displaysize]'] = get_string('errordisplaysize', 'customfield_multiselect');
         }
 
-        // Each token in defaultvalue must exist in the options list.
         $defaultraw = trim($data['configdata']['defaultvalue'] ?? '');
         if ($defaultraw !== '') {
             $defaults = array_map('trim', explode(',', $defaultraw));
@@ -145,9 +119,6 @@ class field_controller extends \core_customfield\field_controller {
 
     /**
      * Return the parsed options list from configdata.
-     *
-     * Splits the stored options string on newlines, trims whitespace,
-     * and removes blank lines. Used by both this class and data_controller.
      *
      * @return string[] Ordered array of option text values.
      */

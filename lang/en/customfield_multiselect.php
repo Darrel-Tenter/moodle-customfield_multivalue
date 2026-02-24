@@ -24,15 +24,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['defaultvalue']            = 'Default selection';
-$string['defaultvalue_help']       = 'Optionally enter one or more option values to pre-select by default, separated by commas with no spaces around the commas. Each token must exactly match an option in the list above. Leave blank for no default selection.';
-$string['displaysize']             = 'Display size (rows)';
-$string['displaysize_help']        = 'Number of visible rows in the selection control. Minimum 2, maximum 20.';
+$string['defaultvalue'] = 'Default selection';
+$string['defaultvalue_help'] = 'Optionally enter one or more option values to pre-select by default, separated by commas with no spaces around the commas. Each token must exactly match an option in the list above. Leave blank for no default selection.';
+$string['displaysize'] = 'Display size (rows)';
+$string['displaysize_help'] = 'Number of visible rows in the selection control. Minimum 2, maximum 20.';
 $string['errordefaultnotanoption'] = 'The default value "{$a}" is not in the options list. Each default token must match an option exactly.';
-$string['errordisplaysize']        = 'Display size must be a positive integer.';
-$string['erroroptionsrequired']    = 'You must enter at least one option.';
-$string['options']                 = 'Options';
-$string['options_help']            = 'Enter each selectable option on its own line. The exact text you enter here is stored in the database when the option is selected, so do not change option text after data has been saved — existing records will no longer match.';
-$string['pluginname']              = 'Multi-select';
-$string['privacy:metadata']        = 'The multi-select custom field type plugin does not store any personal data. All custom field data is stored and managed by the core customfield subsystem.';
-$string['specificsettings']        = 'Multi-select field settings';
+$string['errordisplaysize'] = 'Display size must be a positive integer.';
+$string['erroroptionsrequired'] = 'You must enter at least one option.';
+$string['options'] = 'Options';
+$string['options_help'] = 'Enter each selectable option on its own line. The exact text you enter here is stored in the database when the option is selected — do not change option text after records have been tagged, as existing data will no longer match.';
+$string['pluginname'] = 'Multi-select';
+$string['privacy:metadata'] = 'The multi-select custom field type plugin does not store any personal data. All custom field data is stored and managed by the core customfield subsystem.';
+$string['specificsettings'] = 'Multi-select field settings';

@@ -15,12 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy API implementation for customfield_multiselect.
- *
- * This plugin does not store or process personal data itself.
- * All custom field data (including the selected values) is stored and managed
- * by the core customfield subsystem in mdl_customfield_data. The core system
- * handles all privacy requests (export, deletion) for that table.
+ * Privacy provider for customfield_multiselect.
  *
  * @package   customfield_multiselect
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
@@ -29,16 +24,17 @@
 
 namespace customfield_multiselect\privacy;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Privacy provider — this plugin stores no personal data beyond what the
- * core customfield subsystem already manages.
+ * Privacy provider — this plugin stores no personal data directly.
  */
 class provider implements \core_privacy\local\metadata\null_provider {
 
     /**
-     * Returns the reason why this plugin stores no personal data.
+     * Return the reason this plugin stores no personal data.
      *
-     * @return string Language string identifier explaining the null provider status.
+     * @return string Language string key.
      */
     public static function get_reason(): string {
         return 'privacy:metadata';

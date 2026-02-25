@@ -83,7 +83,7 @@ class field_controller extends \core_customfield\field_controller {
      * @param  array $files Submitted files (unused).
      * @return array        Associative array of element name => error string.
      */
-    public function config_form_validation(array $data, array $files = []): array {
+    public function config_form_validation(array $data, $files = []): array {
         $errors = [];
 
         $raw = trim($data['configdata']['options'] ?? '');

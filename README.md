@@ -132,3 +132,9 @@ Bug reports and pull requests are welcome via GitHub Issues and Pull Requests.
 ## License
 
 GNU GPL v3 or later — https://www.gnu.org/copyleft/gpl.html
+
+## Version history
+Moodle 4.5+ and 5.x compatible
+Fixed: config_form_validation() $files parameter type hint removed to match parent signature
+Fixed: get_default_value() implemented as required by Moodle 4.5 abstract method
+Fixed: get_value() override removed to avoid return type conflict with Moodle 5.x parent

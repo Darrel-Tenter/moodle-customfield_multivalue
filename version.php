@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'customfield_multiselect';
-$plugin->version   = 2026022301;
+$plugin->version   = 2026030301;
 $plugin->requires  = 2024042200; // Moodle 5.0 minimum.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.1';
+$plugin->release   = '1.0.2';

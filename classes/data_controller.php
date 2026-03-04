@@ -197,6 +197,19 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
+     * Return the default value for this field as defined in field configuration.
+     *
+     * Required by core_customfield\data_controller in Moodle 4.5 as an abstract
+     * method. Returns the comma-separated default string from configdata, or
+     * empty string if no default is set.
+     *
+     * @return string The default value, or empty string.
+     */
+    public function get_default_value() {
+        return trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
+    }
+
+    /**
      * Return the stored comma-separated value, or empty string if no record exists.
      *
      * Named distinctly from get_value() to avoid conflicting with the parent's

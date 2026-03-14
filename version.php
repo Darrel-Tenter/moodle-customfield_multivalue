@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for customfield_multiselect.
+ * Version information for customfield_multivalue.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'customfield_multiselect';
+$plugin->component = 'customfield_multivalue';
 $plugin->version   = 2026030301;
 $plugin->requires  = 2024042200; // Moodle 5.0 minimum.
 $plugin->maturity  = MATURITY_STABLE;

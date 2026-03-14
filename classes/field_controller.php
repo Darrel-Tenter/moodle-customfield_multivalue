@@ -15,24 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Field controller for customfield_multiselect.
+ * Field controller for customfield_multivalue.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customfield_multiselect;
+namespace customfield_multivalue;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Field controller class for the multiselect custom field type.
+ * Field controller class for the multivalue custom field type.
  */
 class field_controller extends \core_customfield\field_controller {
 
     /** @var string Plugin type identifier. Must match the directory name under customfield/field/. */
-    const TYPE = 'multiselect';
+    const TYPE = 'multivalue';
 
     /**
      * Add field-type-specific settings to the field configuration form.
@@ -42,38 +42,38 @@ class field_controller extends \core_customfield\field_controller {
     public function config_form_definition(\MoodleQuickForm $mform): void {
         $mform->addElement(
             'header',
-            'header_multiselect_settings',
-            get_string('specificsettings', 'customfield_multiselect')
+            'header_multivalue_settings',
+            get_string('specificsettings', 'customfield_multivalue')
         );
-        $mform->setExpanded('header_multiselect_settings', true);
+        $mform->setExpanded('header_multivalue_settings', true);
 
         $mform->addElement(
             'textarea',
             'configdata[options]',
-            get_string('options', 'customfield_multiselect'),
+            get_string('options', 'customfield_multivalue'),
             ['rows' => 10, 'cols' => 40]
         );
         $mform->setType('configdata[options]', PARAM_TEXT);
-        $mform->addHelpButton('configdata[options]', 'options', 'customfield_multiselect');
+        $mform->addHelpButton('configdata[options]', 'options', 'customfield_multivalue');
 
         $mform->addElement(
             'text',
             'configdata[defaultvalue]',
-            get_string('defaultvalue', 'customfield_multiselect'),
+            get_string('defaultvalue', 'customfield_multivalue'),
             ['size' => 60]
         );
         $mform->setType('configdata[defaultvalue]', PARAM_TEXT);
-        $mform->addHelpButton('configdata[defaultvalue]', 'defaultvalue', 'customfield_multiselect');
+        $mform->addHelpButton('configdata[defaultvalue]', 'defaultvalue', 'customfield_multivalue');
 
         $mform->addElement(
             'text',
             'configdata[displaysize]',
-            get_string('displaysize', 'customfield_multiselect'),
+            get_string('displaysize', 'customfield_multivalue'),
             ['size' => 4]
         );
         $mform->setType('configdata[displaysize]', PARAM_INT);
         $mform->setDefault('configdata[displaysize]', 5);
-        $mform->addHelpButton('configdata[displaysize]', 'displaysize', 'customfield_multiselect');
+        $mform->addHelpButton('configdata[displaysize]', 'displaysize', 'customfield_multivalue');
     }
 
     /**
@@ -88,7 +88,7 @@ class field_controller extends \core_customfield\field_controller {
 
         $raw = trim($data['configdata']['options'] ?? '');
         if ($raw === '') {
-            $errors['configdata[options]'] = get_string('erroroptionsrequired', 'customfield_multiselect');
+            $errors['configdata[options]'] = get_string('erroroptionsrequired', 'customfield_multivalue');
             return $errors;
         }
 
@@ -96,7 +96,7 @@ class field_controller extends \core_customfield\field_controller {
 
         $displaysize = (int)($data['configdata']['displaysize'] ?? 0);
         if ($displaysize < 1) {
-            $errors['configdata[displaysize]'] = get_string('errordisplaysize', 'customfield_multiselect');
+            $errors['configdata[displaysize]'] = get_string('errordisplaysize', 'customfield_multivalue');
         }
 
         $defaultraw = trim($data['configdata']['defaultvalue'] ?? '');
@@ -106,7 +106,7 @@ class field_controller extends \core_customfield\field_controller {
                 if ($token !== '' && !in_array($token, $options, true)) {
                     $errors['configdata[defaultvalue]'] = get_string(
                         'errordefaultnotanoption',
-                        'customfield_multiselect',
+                        'customfield_multivalue',
                         s($token)
                     );
                     break;

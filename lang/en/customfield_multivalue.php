@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language strings for customfield_multiselect.
+ * Language strings for customfield_multivalue.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,6 +33,6 @@ $string['errordisplaysize'] = 'Display size must be a positive integer.';
 $string['erroroptionsrequired'] = 'You must enter at least one option.';
 $string['options'] = 'Options';
 $string['options_help'] = 'Enter each selectable option on its own line. The exact text you enter here is stored in the database when the option is selected — do not change option text after records have been tagged, as existing data will no longer match.';
-$string['pluginname'] = 'Multi-select';
-$string['privacy:metadata'] = 'The multi-select custom field type plugin does not store any personal data. All custom field data is stored and managed by the core customfield subsystem.';
-$string['specificsettings'] = 'Multi-select field settings';
+$string['pluginname'] = 'Multi-value';
+$string['privacy:metadata'] = 'The multi-value custom field type plugin does not store any personal data. All custom field data is stored and managed by the core customfield subsystem.';
+$string['specificsettings'] = 'Multi-value field settings';

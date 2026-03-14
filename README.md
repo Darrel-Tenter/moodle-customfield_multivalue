@@ -1,6 +1,6 @@
-# Multi-Select Custom Field for Moodle
+# Multi-Value Custom Field for Moodle
 
-A Moodle plugin that adds a **multi-select field type** to Moodle's modern `customfield_*` API — available anywhere Moodle uses that API: courses, programs, certifications, and more.
+A Moodle plugin that adds a **multi-value field type** to Moodle's modern `customfield_*` API — available anywhere Moodle uses that API: courses, programs, certifications, and more.
 
 ## The Problem
 
@@ -8,7 +8,7 @@ Moodle's built-in custom field types include text, number, checkbox, date, and s
 
 ## The Solution
 
-`customfield_multiselect` adds a multi-select field type that integrates natively with Moodle's `customfield_*` API. Once installed, it appears alongside the built-in field types wherever custom fields are configured — course settings, Workplace programs, Workplace certifications, and any other component that uses the modern customfield system.
+`customfield_multivalue` adds a multi-value field type that integrates natively with Moodle's `customfield_*` API. Once installed, it appears alongside the built-in field types wherever custom fields are configured — course settings, Workplace programs, Workplace certifications, and any other component that uses the modern customfield system.
 
 ### Features
 
@@ -26,7 +26,7 @@ Moodle's built-in custom field types include text, number, checkbox, date, and s
 Clone into the `customfield` directory of your Moodle installation:
 
 ```bash
-git clone https://github.com/[your-org]/moodle-customfield_multiselect.git customfield/multiselect
+git clone https://github.com/[your-org]/moodle-customfield_multivalue.git customfield/multivalue
 ```
 
 Then log in as admin and go to **Site Administration → Notifications** to trigger installation.
@@ -34,20 +34,20 @@ Then log in as admin and go to **Site Administration → Notifications** to trig
 ### Via zip
 
 1. Download the zip from GitHub
-2. Unzip and rename the folder to `multiselect`
-3. Place it at `customfield/multiselect/` in your Moodle root
+2. Unzip and rename the folder to `multivalue`
+3. Place it at `customfield/multivalue/` in your Moodle root
 4. Go to **Site Administration → Notifications** to install
 
 **Deployment classification: Major Release** — install on a dev/staging site first and verify field creation and storage before deploying to production.
 
 ## Usage
 
-After installation, the **Multi-select** field type appears in the custom fields configuration UI (e.g., **Site Administration → Courses → Course custom fields**).
+After installation, the **Multi-value** field type appears in the custom fields configuration UI (e.g., **Site Administration → Courses → Course custom fields**).
 
 ### Creating a field
 
 1. Go to the relevant custom fields admin page
-2. Add a new field and select **Multi-select** as the type
+2. Add a new field and select **Multi-value** as the type
 3. Enter your options list — one option per line
 4. Optionally set a default value and display size
 5. Save
@@ -77,7 +77,7 @@ SELECT c.id, c.fullname
 ## File Structure
 
 ```
-customfield_multiselect/
+customfield_multivalue/
 ├── classes/
 │   ├── data_controller.php     # Saves/retrieves values; implements export_value()
 │   ├── field_controller.php    # Admin form: options list, default, display size
@@ -85,7 +85,7 @@ customfield_multiselect/
 │       └── provider.php        # null_provider — core customfield handles data storage
 ├── lang/
 │   └── en/
-│       └── customfield_multiselect.php   # All strings
+│       └── customfield_multivalue.php   # All strings
 └── version.php                 # Plugin metadata
 ```
 
@@ -115,7 +115,7 @@ Example: selecting `SE 49` and `SE 51` stores `SE 49,SE 51`. `FIND_IN_SET('SE 49
 ### What this plugin does NOT do
 
 - **Does not support the legacy `user_info_field` system** — Moodle has two separate custom field systems. This plugin works with the modern `customfield_*` API only (courses, programs, certifications). User profile fields use a different architecture and are not supported.
-- **Does not use `intvalue`** — Unlike `customfield_checkbox`, this plugin stores all data in the `value` column. Do not query `intvalue` for multi-select fields.
+- **Does not use `intvalue`** — Unlike `customfield_checkbox`, this plugin stores all data in the `value` column. Do not query `intvalue` for multi-value fields.
 - **Does not validate options against the configured list on retrieval** — If the options list changes after data has been saved, existing stored values are preserved as-is.
 
 ## Compatibility

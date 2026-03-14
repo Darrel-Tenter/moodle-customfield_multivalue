@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Restore plugin for customfield_multiselect.
+ * Restore plugin for customfield_multivalue.
  *
  * Restores the comma-separated value stored in mdl_customfield_data.value
- * for each multiselect field instance. No additional tables are involved.
+ * for each multivalue field instance. No additional tables are involved.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,14 +28,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Restore plugin class for customfield_multiselect.
+ * Restore plugin class for customfield_multivalue.
  *
  * The customfield restore framework calls define_plugin_structure() to
  * declare the restore path elements matching the backup structure. Since
  * this plugin produces an empty backup element, the restore element is
  * also empty — no extra processing is required on restore.
  */
-class restore_customfield_multiselect_plugin extends restore_customfield_plugin {
+class restore_customfield_multivalue_plugin extends restore_customfield_plugin {
 
     /**
      * Define the plugin restore structure.

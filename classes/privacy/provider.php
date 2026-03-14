@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider for customfield_multiselect.
+ * Privacy provider for customfield_multivalue.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customfield_multiselect\privacy;
+namespace customfield_multivalue\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Data controller for customfield_multiselect.
+ * Data controller for customfield_multivalue.
  *
  * STORAGE CONTRACT:
  *   Selected values are stored as a comma-separated string of option text values
@@ -25,17 +25,17 @@
  *   - Empty selection is stored as '' (empty string), never NULL.
  *   - intvalue is set to 0 (not used for this type).
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace customfield_multiselect;
+namespace customfield_multivalue;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Data controller class for the multiselect custom field type.
+ * Data controller class for the multivalue custom field type.
  */
 class data_controller extends \core_customfield\data_controller {
 
@@ -51,7 +51,7 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Add the multiselect element to the instance edit form (e.g., course settings).
+     * Add the multivalue element to the instance edit form (e.g., course settings).
      *
      * Uses Moodle's autocomplete form element with multiple selection enabled.
      *

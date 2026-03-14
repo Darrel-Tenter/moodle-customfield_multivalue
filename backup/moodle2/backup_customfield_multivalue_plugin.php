@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Backup plugin for customfield_multiselect.
+ * Backup plugin for customfield_multivalue.
  *
  * Backs up the comma-separated value stored in mdl_customfield_data.value
- * for each multiselect field instance. No additional tables are involved.
+ * for each multivalue field instance. No additional tables are involved.
  *
- * @package   customfield_multiselect
+ * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Backup plugin class for customfield_multiselect.
+ * Backup plugin class for customfield_multivalue.
  *
  * The customfield backup framework calls define_plugin_structure() to
  * declare what extra data (beyond the core customfield_data record) this
@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * value column, so no extra structure is needed — we return an empty
  * plugin element.
  */
-class backup_customfield_multiselect_plugin extends backup_customfield_plugin {
+class backup_customfield_multivalue_plugin extends backup_customfield_plugin {
 
     /**
      * Define the plugin backup structure.

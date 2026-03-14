@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="customfield/field/multiselect/db" VERSION="20260223" COMMENT="XMLDB file for customfield_multiselect. This plugin uses no custom tables; all data is stored in the core customfield_data table."
+<XMLDB PATH="customfield/field/multivalue/db" VERSION="20260223" COMMENT="XMLDB file for customfield_multivalue. This plugin uses no custom tables; all data is stored in the core customfield_data table."
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >

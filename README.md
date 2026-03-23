@@ -14,19 +14,19 @@ Moodle's built-in custom field types include text, number, checkbox, date, and s
 
 - Select one or more values from an administrator-defined options list
 - Options list is configured per-field (one option per line in the field settings)
-- Stored as a comma-separated string — queryable with standard SQL (`FIND_IN_SET`)
-- Supports empty selection (stores empty string, not NULL)
+- Stored as a JSON array — supports option values containing commas
+- Supports empty selection (stores `[]`, not NULL)
 - Works anywhere Moodle's modern `customfield_*` API is used
-- Compatible with Moodle 5.0+
+- Compatible with Moodle 4.4+
 
 ## Installation
 
 ### Via git
 
-Clone into the `customfield` directory of your Moodle installation:
+Clone into the `customfield/field/` directory of your Moodle installation:
 
 ```bash
-git clone https://github.com/[your-org]/moodle-customfield_multivalue.git customfield/multivalue
+git clone https://github.com/Darrel-Tenter/moodle-customfield_multivalue customfield/field/multivalue
 ```
 
 Then log in as admin and go to **Site Administration → Notifications** to trigger installation.
@@ -35,7 +35,7 @@ Then log in as admin and go to **Site Administration → Notifications** to trig
 
 1. Download the zip from GitHub
 2. Unzip and rename the folder to `multivalue`
-3. Place it at `customfield/multivalue/` in your Moodle root
+3. Place it at `customfield/field/multivalue/` in your Moodle root
 4. Go to **Site Administration → Notifications** to install
 
 **Deployment classification: Major Release** — install on a dev/staging site first and verify field creation and storage before deploying to production.
@@ -49,7 +49,7 @@ After installation, the **Multi-value** field type appears in the custom fields 
 1. Go to the relevant custom fields admin page
 2. Add a new field and select **Multi-value** as the type
 3. Enter your options list — one option per line
-4. Optionally set a default value and display size
+4. Optionally set a default selection (one option per line, must match the options list exactly) and display size
 5. Save
 
 ### Using the field
@@ -58,20 +58,20 @@ The field renders as an autocomplete multi-select input on the relevant edit for
 
 ### Querying stored values
 
-Values are stored as a comma-separated string in `mdl_customfield_data.value`. For example, selecting `Option A` and `Option C` stores:
+Values are stored as a JSON array in `mdl_customfield_data.value`. For example, selecting `Option A` and `Option C` stores:
 
-```
-Option A,Option C
+```json
+["Option A","Option C"]
 ```
 
-To query records tagged with a specific value, use MySQL's `FIND_IN_SET`:
+To query records tagged with a specific value, use MySQL's `JSON_CONTAINS`:
 
 ```sql
 SELECT c.id, c.fullname
   FROM {course} c
   JOIN {customfield_data} cf ON cf.instanceid = c.id
    AND cf.fieldid = :fieldid
- WHERE FIND_IN_SET(:value, cf.value) > 0
+ WHERE JSON_CONTAINS(cf.value, JSON_QUOTE(:value))
 ```
 
 ## File Structure
@@ -104,13 +104,13 @@ Moodle's `customfield_*` plugin type requires two classes:
 
 | Rule | Detail |
 |---|---|
-| Storage column | `mdl_customfield_data.value` (string) |
-| Format | Comma-separated option text values, no spaces around commas |
+| Storage column | `mdl_customfield_data.value` (TEXT) |
+| Format | JSON-encoded array of option text values |
 | `intvalue` column | Not used — always set to `0` |
-| Empty selection | Stored as empty string `''`, not `NULL` |
-| Whitespace | Trimmed from each value before joining |
+| Empty selection | Stored as `[]`, not `NULL` |
+| Whitespace | Trimmed from each value before encoding |
 
-Example: selecting `SE 49` and `SE 51` stores `SE 49,SE 51`. `FIND_IN_SET('SE 49', 'SE 49,SE 51')` returns `1`.
+Example: selecting `SE 49` and `SE 51` stores `["SE 49","SE 51"]`.
 
 ### What this plugin does NOT do
 
@@ -120,9 +120,9 @@ Example: selecting `SE 49` and `SE 51` stores `SE 49,SE 51`. `FIND_IN_SET('SE 49
 
 ## Compatibility
 
-- **Moodle**: 5.0+ (built and tested on Moodle Workplace 5.1.3)
-- **PHP**: 8.2+
-- **Database**: MySQL / MariaDB (uses `FIND_IN_SET` for queries — not available on PostgreSQL without modification)
+- **Moodle**: 4.4+ (tested on Moodle 4.5 and Moodle Workplace 5.1)
+- **PHP**: 8.1+
+- **Database**: MySQL / MariaDB (JSON_CONTAINS used for queries)
 - **Themes**: All themes (field type has no theme-specific output)
 
 ## Contributing
@@ -134,7 +134,22 @@ Bug reports and pull requests are welcome via GitHub Issues and Pull Requests.
 GNU GPL v3 or later — https://www.gnu.org/copyleft/gpl.html
 
 ## Version history
-Moodle 4.5+ and 5.x compatible
-Fixed: config_form_validation() $files parameter type hint removed to match parent signature
-Fixed: get_default_value() implemented as required by Moodle 4.5 abstract method
-Fixed: get_value() override removed to avoid return type conflict with Moodle 5.x parent
+
+### v1.0.4
+- Fixed: default values were never applied on first edit — `get_stored_value()` was returning the raw default string (not JSON), causing `json_decode` to silently fail
+- Improved: Default selection config field changed from text input to textarea (one value per line), matching the Options field format and supporting option values that contain commas
+- Added: `field_controller::get_default_values()` public helper
+
+### v1.0.3
+- Fixed: `config_form_validation()` `$files` parameter type hint removed to match parent signature
+- Fixed: `get_default_value()` implemented as required by Moodle 4.5 abstract method
+- Fixed: `get_value()` override removed to avoid return type conflict with Moodle 5.x parent
+- Removed: empty `install.xml` that caused a `ddl_exception` on installation
+- Removed: unnecessary backup/restore files
+
+### v1.0.2
+- Fixed PHP 8.x compatibility issues
+- Added missing files
+
+### v1.0.1
+- Initial release

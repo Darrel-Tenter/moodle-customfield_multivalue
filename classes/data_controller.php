@@ -100,9 +100,10 @@ class data_controller extends \core_customfield\data_controller {
             $selected = json_decode($stored, true) ?? [];
             $mform->getElement($elementname)->setSelected($selected);
         } else {
-            $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
-            if ($defaultraw !== '') {
-                $defaults = array_map('trim', explode(',', $defaultraw));
+            /** @var field_controller $fc */
+            $fc = $this->get_field();
+            $defaults = $fc->get_default_values();
+            if (!empty($defaults)) {
                 $mform->getElement($elementname)->setSelected($defaults);
             }
         }
@@ -120,12 +121,9 @@ class data_controller extends \core_customfield\data_controller {
         if ($stored !== '') {
             $instance->$elementname = json_decode($stored, true) ?? [];
         } else {
-            $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
-            if ($defaultraw !== '') {
-                $instance->$elementname = array_map('trim', explode(',', $defaultraw));
-            } else {
-                $instance->$elementname = [];
-            }
+            /** @var field_controller $fc */
+            $fc = $this->get_field();
+            $instance->$elementname = $fc->get_default_values();
         }
     }
 
@@ -207,16 +205,20 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Return the stored JSON value, or empty string if no record exists.
+     * Return the stored JSON value, or empty string if no record exists yet.
+     *
+     * Returns empty string when there is no saved record so that callers fall
+     * through to their default-value handling rather than receiving a non-JSON
+     * string that silently fails json_decode.
      *
      * Named distinctly from get_value() to avoid conflicting with the parent's
      * mixed return type declaration in Moodle 5.x.
      *
-     * @return string The stored value, or empty string.
+     * @return string JSON-encoded value, or empty string if no record exists.
      */
     private function get_stored_value(): string {
         if (!$this->get('id')) {
-            return trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
+            return '';
         }
         return (string)$this->get($this->datafield());
     }

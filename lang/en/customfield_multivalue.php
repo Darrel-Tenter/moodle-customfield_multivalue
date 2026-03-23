@@ -23,7 +23,7 @@
  */
 
 $string['defaultvalue'] = 'Default selection';
-$string['defaultvalue_help'] = 'Optionally enter one or more option values to pre-select by default, separated by commas with no spaces around the commas. Each token must exactly match an option in the list above. Leave blank for no default selection.';
+$string['defaultvalue_help'] = 'Optionally enter one or more option values to pre-select by default, one per line. Each value must exactly match an option in the list above. Leave blank for no default selection.';
 $string['displaysize'] = 'Display size (rows)';
 $string['displaysize_help'] = 'Number of visible rows in the selection control. Minimum 2, maximum 20.';
 $string['errordefaultnotanoption'] = 'The default value "{$a}" is not in the options list. Each default token must match an option exactly.';

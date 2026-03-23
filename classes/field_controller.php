@@ -57,10 +57,10 @@ class field_controller extends \core_customfield\field_controller {
         $mform->addHelpButton('configdata[options]', 'options', 'customfield_multivalue');
 
         $mform->addElement(
-            'text',
+            'textarea',
             'configdata[defaultvalue]',
             get_string('defaultvalue', 'customfield_multivalue'),
-            ['size' => 60]
+            ['rows' => 4, 'cols' => 40]
         );
         $mform->setType('configdata[defaultvalue]', PARAM_TEXT);
         $mform->addHelpButton('configdata[defaultvalue]', 'defaultvalue', 'customfield_multivalue');
@@ -101,9 +101,8 @@ class field_controller extends \core_customfield\field_controller {
 
         $defaultraw = trim($data['configdata']['defaultvalue'] ?? '');
         if ($defaultraw !== '') {
-            $defaults = array_map('trim', explode(',', $defaultraw));
-            foreach ($defaults as $token) {
-                if ($token !== '' && !in_array($token, $options, true)) {
+            foreach ($this->parse_options($defaultraw) as $token) {
+                if (!in_array($token, $options, true)) {
                     $errors['configdata[defaultvalue]'] = get_string(
                         'errordefaultnotanoption',
                         'customfield_multivalue',
@@ -124,6 +123,19 @@ class field_controller extends \core_customfield\field_controller {
      */
     public function get_options(): array {
         $raw = $this->get_configdata_property('options') ?? '';
+        return $this->parse_options($raw);
+    }
+
+    /**
+     * Return the configured default values as an array.
+     *
+     * The defaultvalue config property stores one option per line (the same
+     * newline-delimited format as the options textarea).
+     *
+     * @return string[] Array of pre-selected default option values, may be empty.
+     */
+    public function get_default_values(): array {
+        $raw = $this->get_configdata_property('defaultvalue') ?? '';
         return $this->parse_options($raw);
     }
 

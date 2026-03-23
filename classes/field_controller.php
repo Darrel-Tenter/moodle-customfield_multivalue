@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,14 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Field controller for customfield_multivalue.
  *
  * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace customfield_multivalue;
@@ -80,10 +80,10 @@ class field_controller extends \core_customfield\field_controller {
      * Validate the field configuration form data.
      *
      * @param  array $data  Submitted form data.
-     * @param  array $files Submitted files (unused).
+     * @param  array $files Submitted files (not used).
      * @return array        Associative array of element name => error string.
      */
-    public function config_form_validation(array $data, $files = []): array {
+    public function config_form_validation(array $data, array $files = []): array {
         $errors = [];
 
         $raw = trim($data['configdata']['options'] ?? '');

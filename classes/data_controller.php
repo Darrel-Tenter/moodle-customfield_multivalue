@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,22 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Data controller for customfield_multivalue.
  *
  * STORAGE CONTRACT:
- *   Selected values are stored as a comma-separated string of option text values
- *   in mdl_customfield_data.value — e.g., 'SE 49,SE 51'.
- *   - No spaces around commas.
- *   - Each token matches an option value exactly (trimmed).
- *   - Empty selection is stored as '' (empty string), never NULL.
+ *   Selected values are stored as a JSON-encoded array of option text values
+ *   in mdl_customfield_data.value — e.g., '["SE 49","SE 51"]'.
+ *   - Empty selection is stored as '[]' or '' (empty string), never NULL.
  *   - intvalue is set to 0 (not used for this type).
+ *   - JSON encoding is used so option values containing commas are preserved.
  *
  * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace customfield_multivalue;
@@ -84,8 +83,7 @@ class data_controller extends \core_customfield\data_controller {
     /**
      * Called from instance edit form definition_after_data().
      *
-     * Converts the stored comma-separated string back into an array so that
-     * MoodleQuickForm can pre-select the correct options.
+     * Decodes the stored JSON array so MoodleQuickForm can pre-select the correct options.
      *
      * @param \MoodleQuickForm $mform The instance edit form.
      */
@@ -99,7 +97,7 @@ class data_controller extends \core_customfield\data_controller {
         $stored = $this->get_stored_value();
 
         if ($stored !== '') {
-            $selected = array_map('trim', explode(',', $stored));
+            $selected = json_decode($stored, true) ?? [];
             $mform->getElement($elementname)->setSelected($selected);
         } else {
             $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
@@ -120,7 +118,7 @@ class data_controller extends \core_customfield\data_controller {
         $stored      = $this->get_stored_value();
 
         if ($stored !== '') {
-            $instance->$elementname = array_map('trim', explode(',', $stored));
+            $instance->$elementname = json_decode($stored, true) ?? [];
         } else {
             $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
             if ($defaultraw !== '') {
@@ -146,13 +144,13 @@ class data_controller extends \core_customfield\data_controller {
         $submitted = $datanew->$elementname;
 
         if (is_array($submitted)) {
-            $tokens = array_map('trim', $submitted);
-            $tokens = array_filter($tokens, static function($t) {
+            $tokens = array_values(array_filter(array_map('trim', $submitted), static function($t) {
                 return $t !== '';
-            });
-            $value = implode(',', array_values($tokens));
+            }));
+            $value = json_encode($tokens);
         } else {
-            $value = trim((string)$submitted);
+            $trimmed = trim((string)$submitted);
+            $value = $trimmed !== '' ? json_encode([$trimmed]) : '[]';
         }
 
         $this->set('value', $value);
@@ -165,16 +163,15 @@ class data_controller extends \core_customfield\data_controller {
      *
      * @return array|null Array of selected values, or null if empty.
      */
-    public function export_value() {
+    public function export_value(): ?array {
         $stored = $this->get_stored_value();
 
         if ($stored === '') {
             return null;
         }
 
-        $values = array_map('trim', explode(',', $stored));
-        $values = array_filter($values, static function($v) {
-            return $v !== '';
+        $values = array_filter(json_decode($stored, true) ?? [], static function($v) {
+            return trim((string)$v) !== '';
         });
 
         return empty($values) ? null : array_values($values);
@@ -205,12 +202,12 @@ class data_controller extends \core_customfield\data_controller {
      *
      * @return string The default value, or empty string.
      */
-    public function get_default_value() {
+    public function get_default_value(): string {
         return trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
     }
 
     /**
-     * Return the stored comma-separated value, or empty string if no record exists.
+     * Return the stored JSON value, or empty string if no record exists.
      *
      * Named distinctly from get_value() to avoid conflicting with the parent's
      * mixed return type declaration in Moodle 5.x.
@@ -219,8 +216,7 @@ class data_controller extends \core_customfield\data_controller {
      */
     private function get_stored_value(): string {
         if (!$this->get('id')) {
-            $defaultraw = trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
-            return $defaultraw;
+            return trim($this->get_field()->get_configdata_property('defaultvalue') ?? '');
         }
         return (string)$this->get($this->datafield());
     }

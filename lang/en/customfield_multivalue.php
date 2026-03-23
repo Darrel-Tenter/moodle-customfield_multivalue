@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,17 +12,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Language strings for customfield_multivalue.
  *
  * @package   customfield_multivalue
  * @copyright 2026 Direct Support Learning <support@directsupportlearning.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 $string['defaultvalue'] = 'Default selection';
 $string['defaultvalue_help'] = 'Optionally enter one or more option values to pre-select by default, separated by commas with no spaces around the commas. Each token must exactly match an option in the list above. Leave blank for no default selection.';

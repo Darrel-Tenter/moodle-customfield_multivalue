@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git -C /Users/darrel/Projects/DSL/plugins/moodle-customfield_multiselect/.claude/worktrees/thirsty-maxwell log --oneline -5)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)"
-    ]
-  }
-}

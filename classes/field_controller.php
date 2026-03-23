@@ -80,10 +80,10 @@ class field_controller extends \core_customfield\field_controller {
      * Validate the field configuration form data.
      *
      * @param  array $data  Submitted form data.
-     * @param  array $files Submitted files (not used).
+     * @param  array $files Submitted files (unused).
      * @return array        Associative array of element name => error string.
      */
-    public function config_form_validation(array $data, array $files = []): array {
+    public function config_form_validation(array $data, $files = []): array {
         $errors = [];
 
         $raw = trim($data['configdata']['options'] ?? '');

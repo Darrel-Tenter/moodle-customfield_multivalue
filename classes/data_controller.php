@@ -157,11 +157,11 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Returns the value in a human-readable format for display.
+     * Returns the value as a comma-separated string for display and report builder compatibility.
      *
-     * @return array|null Array of selected values, or null if empty.
+     * @return string|null Comma-separated selected values, or null if empty.
      */
-    public function export_value(): ?array {
+    public function export_value(): ?string {
         $stored = $this->get_stored_value();
 
         if ($stored === '') {
@@ -172,7 +172,7 @@ class data_controller extends \core_customfield\data_controller {
             return trim((string)$v) !== '';
         });
 
-        return empty($values) ? null : array_values($values);
+        return empty($values) ? null : implode(', ', array_values($values));
     }
 
     /**

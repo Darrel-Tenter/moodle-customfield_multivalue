@@ -81,35 +81,6 @@ class data_controller extends \core_customfield\data_controller {
     }
 
     /**
-     * Called from instance edit form definition_after_data().
-     *
-     * Decodes the stored JSON array so MoodleQuickForm can pre-select the correct options.
-     *
-     * @param \MoodleQuickForm $mform The instance edit form.
-     */
-    public function instance_form_definition_after_data(\MoodleQuickForm $mform): void {
-        $elementname = $this->get_form_element_name();
-
-        if (!$mform->elementExists($elementname)) {
-            return;
-        }
-
-        $stored = $this->get_stored_value();
-
-        if ($stored !== '') {
-            $selected = json_decode($stored, true) ?? [];
-            $mform->getElement($elementname)->setSelected($selected);
-        } else {
-            /** @var field_controller $fc */
-            $fc = $this->get_field();
-            $defaults = $fc->get_default_values();
-            if (!empty($defaults)) {
-                $mform->getElement($elementname)->setSelected($defaults);
-            }
-        }
-    }
-
-    /**
      * Prepare custom field data for set_data() before the form is displayed.
      *
      * @param \stdClass $instance The record being edited (e.g., a course object).
